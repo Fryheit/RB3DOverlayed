@@ -15,7 +15,7 @@ namespace RB3DOverlayed
     using Overlay;
     using Vector3 = SlimDX.Vector3;
     using NVector3 = Clio.Utilities.Vector3;
-    
+
     public class Plugin : BotPlugin
     {
         public override string Name => "3D Overlayed";
@@ -24,9 +24,9 @@ namespace RB3DOverlayed
         public override Version Version => new Version(1, 0, 0);
         public override string ButtonText => "Settings";
         public override bool WantButton => true;
-        
+
         private RenderForm _renderForm;
-        
+
         private readonly List<uint> _listSMobs = new List<uint>
         {
             2953, // Laideronnette
@@ -59,7 +59,7 @@ namespace RB3DOverlayed
             5988, // Bone Crawler
             5989, // Salt and Light
         };
-            
+
         private readonly List<uint> _listAMobs = new List<uint>
         {
             2936, // Forneus
@@ -104,7 +104,7 @@ namespace RB3DOverlayed
             6000, // Girimekhala
             6001, // Sum
         };
-            
+
         private readonly List<uint> _listBMobs = new List<uint>
         {
             2919, // White Joker
@@ -149,14 +149,14 @@ namespace RB3DOverlayed
             6012, // Manes
             6013, // Kiwa
         };
-        
+
         public override void OnPulse()
         {
         }
 
         public override void OnInitialize()
         {
-            
+
         }
 
         public override void OnShutdown()
@@ -214,7 +214,7 @@ namespace RB3DOverlayed
 
             if (QuestLogManager.InCutscene)
                 return;
-            
+
             // Gameobject list is threadstatic, always need to pulse otherwise new objects wont show up
             GameObjectManager.Update();
 
@@ -230,9 +230,9 @@ namespace RB3DOverlayed
 
             if (settings.DrawSelfBox)
             {
-                DrawSelfBox(ctx);
+                DrawSelfCircle(ctx);
             }
-            
+
             if (settings.DrawHostilityBoxes || settings.DrawUnitLines || settings.DrawGameObjectBoxes ||
                 settings.DrawGameObjectLines)
             {
@@ -345,10 +345,10 @@ namespace RB3DOverlayed
         private void DrawHuntMobs(DrawingContext ctx)
         {
             OverlaySettings settings = OverlaySettings.Instance;
-            
+
             NVector3 mypos = Core.Me.Location;
             Vector3 vecStart = new Vector3(mypos.X, mypos.Y + 1, mypos.Z);
-            
+
             foreach (GameObject obj in GameObjectManager.GameObjects)
             {
                 if (   (!settings.DrawHuntSMobs || !_listSMobs.Contains(obj.NpcId))
@@ -366,14 +366,14 @@ namespace RB3DOverlayed
                     color = Color.Red;
                 if (_listBMobs.Contains(obj.NpcId))
                     color = Color.Green;
-                
+
                 if (!string.IsNullOrEmpty(name))
                     ctx.Draw3DText(name, vecCenter);
 
                 ctx.DrawOutlinedBox(vecCenter, new Vector3(1), Color.FromArgb(255, color));
                 ctx.DrawBox(vecCenter, new Vector3(1), Color.FromArgb(150, color));
-                
-                // Lines toward the hunt to make it easier to spot                
+
+                // Lines toward the hunt to make it easier to spot
                 NVector3 end = obj.Location;
                 Vector3 vecEnd = new Vector3(end.X, end.Y + 1, end.Z);
 
@@ -381,12 +381,12 @@ namespace RB3DOverlayed
             }
         }
 
-        private void DrawSelfBox(DrawingContext ctx)
+        private void DrawSelfCircle(DrawingContext ctx)
         {
-            ctx.DrawOutlinedBox(Core.Me.Location.Convert() + new Vector3(0, 1, 0), new Vector3(1),
-                Color.FromArgb(255, Color.Blue));
+            ctx.DrawCircleOutline(Core.Me.Location, 1, Color.FromArgb(255, Color.Blue));
+            ctx.DrawCircle(Core.Me.Location, 1, Color.FromArgb(150, Color.Blue));
         }
-        
+
         private void DrawGameStats(DrawingContext ctx)
         {
             OverlaySettings settings = OverlaySettings.Instance;
@@ -397,9 +397,9 @@ namespace RB3DOverlayed
                 NVector3 mypos = Core.Me.Location;
                 Vector3 vecStart = new Vector3(mypos.X, mypos.Y, mypos.Z);
                 int myLevel = Core.Me.ClassLevel;
-            
+
                 GameObject currentTarget = Core.Me.CurrentTarget;
-                
+
                 sb.AppendLine($@"My Position: {Core.Me.Location}");
                 if (currentTarget != null)
                 {
@@ -454,11 +454,11 @@ namespace RB3DOverlayed
                 if (!huntFound)
                     sb.AppendLine("None");
             }
-            
+
             sb.AppendLine();
 
             if (settings.UseShadowedText)
-            {                
+            {
                 ctx.DrawOutlinedText(sb.ToString(),
                     settings.GameStatsPositionX,
                     settings.GameStatsPositionY,

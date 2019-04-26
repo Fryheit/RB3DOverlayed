@@ -1,19 +1,19 @@
-﻿namespace RB3DOverlayed.Overlay
+﻿using System;
+using System.Drawing;
+using System.Linq;
+using System.Runtime.InteropServices;
+using ff14bot;
+using System.Runtime.Caching;
+using ff14bot.Overlay3D;
+using SlimDX;
+using SlimDX.Direct3D9;
+using Font = SlimDX.Direct3D9.Font;
+using Mesh = SlimDX.Direct3D9.Mesh;
+using Vector3 = SlimDX.Vector3;
+using Triangle = ff14bot.Managers.Triangle;
+
+namespace RB3DOverlayed.Overlay
 {
-    using System;
-    using System.Drawing;
-    using System.Linq;
-    using System.Runtime.InteropServices;
-    using ff14bot;
-    using System.Runtime.Caching;
-    using ff14bot.Overlay3D;
-    using SlimDX;
-    using SlimDX.Direct2D;
-    using SlimDX.Direct3D9;
-    using Font = SlimDX.Direct3D9.Font;
-    using Mesh = SlimDX.Direct3D9.Mesh;
-    using Vector3 = SlimDX.Vector3;
-    
     public class DrawingContext : IDisposable, I3DDrawer
     {
         private Sprite _fontSprite;
@@ -102,7 +102,7 @@
 
         private Vector3 _lastLocUpdate;
         /// <summary>
-        /// This is uesed to build the Z-Buffer. 
+        /// This is uesed to build the Z-Buffer.
         /// https://en.wikipedia.org/wiki/Z-buffering
         /// </summary>
         private void UpdateZBufferTriangles()
@@ -324,8 +324,7 @@
             _indexBuffer[11] = 7;
 
             SetDeclaration();
-            Device.DrawIndexedUserPrimitives(PrimitiveType.TriangleList, 0, 8, 4, _indexBuffer,
-                Format.Index32, _vertexBuffer, ColoredVertex.Stride);
+            Device.DrawIndexedUserPrimitives(PrimitiveType.TriangleList, 0, 8, 4, _indexBuffer, Format.Index32, _vertexBuffer, ColoredVertex.Stride);
         }
 
         public void DrawTriangle(Vector3 a, Vector3 b, Vector3 c, Color color)
@@ -377,12 +376,15 @@
                 Format.Index16, _vertexBuffer, 16);
         }
 
-        public void DrawCircle(Vector3 center, float radius, int slices, Color color)
+        public void DrawCircle(Clio.Utilities.Vector3 center, float radius, Color color)
         {
+            int slices = 30;
             var radsPerSlice = (float)(Math.PI * 2 / slices);
 
-            _vertexBuffer[0] = new ColoredVertex(center, color);
-            _vertexBuffer[1] = new ColoredVertex(center + new Vector3(radius, 0, 0), color);
+            var newCenter = new Vector3(center.X, center.Y, center.Z);
+
+            _vertexBuffer[0] = new ColoredVertex(newCenter, color);
+            _vertexBuffer[1] = new ColoredVertex(newCenter + new Vector3(radius, 0, 0), color);
 
             for (int i = 0; i < slices; i++)
             {
@@ -390,7 +392,7 @@
                 var cosine = (float)Math.Cos((i + 1) * radsPerSlice);
 
                 _vertexBuffer[2 + i] =
-                    new ColoredVertex(center + new Vector3(cosine * radius, sine * radius, 0),
+                    new ColoredVertex(newCenter + new Vector3(cosine * radius,0, sine * radius),
                         color.ToArgb());
             }
 
@@ -436,7 +438,25 @@
 
         public void DrawCircleOutline(Clio.Utilities.Vector3 center, float radius, Color color)
         {
-            DrawOutlinedBox(center.Convert(), new Vector3(radius), color);
+            int slices = 30;
+            var radsPerSlice = (float)(Math.PI * 2 / slices);
+
+            var newCenter = new Vector3(center.X, center.Y, center.Z);
+
+            for (int i = 0; i < slices; i++)
+            {
+                var sine = (float)Math.Sin((i + 1) * radsPerSlice);
+                var cosine = (float)Math.Cos((i + 1) * radsPerSlice);
+
+                _vertexBuffer[i] =
+                    new ColoredVertex(newCenter + new Vector3(cosine * radius, 0, sine * radius),
+                        color.ToArgb());
+            }
+
+            _vertexBuffer[slices] = _vertexBuffer[0];
+
+            SetDeclaration();
+            Device.DrawUserPrimitives(PrimitiveType.LineStrip, slices, _vertexBuffer);
         }
 
         [StructLayout(LayoutKind.Sequential)]
