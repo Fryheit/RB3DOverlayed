@@ -58,6 +58,10 @@ namespace RB3DOverlayed
             5987, // Udumbara
             5988, // Bone Crawler
             5989, // Salt and Light
+            8653, // Aglaope
+            8890, // Ixtab
+            8895, // Gunitt
+            8915, // Forgiven Rebellion
         };
 
         private readonly List<uint> _listAMobs = new List<uint>
@@ -103,6 +107,18 @@ namespace RB3DOverlayed
             5999, // Angada
             6000, // Girimekhala
             6001, // Sum
+            8654, // The Mudman
+            8655, // O Poorest Pauldia
+            8891, // Supay
+            8892, // Grassman
+            8896, // Rusalka
+            8897, // Baal
+            8901, // Maliktender
+            8902, // Sugaar
+            8906, // Nickelavee
+            8907, // Nariphon
+            8911, // Li'l Murderer
+            8912, // Huracan
         };
 
         private readonly List<uint> _listBMobs = new List<uint>
@@ -148,6 +164,18 @@ namespace RB3DOverlayed
             6011, // Buccaboo
             6012, // Manes
             6013, // Kiwa
+            8656, // Domovoi
+            8657, // Vulpangue
+            8890, // Deacon
+            8893, // Mindmaker
+            8894, // Pachamama
+            8898, // Gilshs Aath Swiftclaw
+            8903, // Worm of the Well
+            8904, // Juggler Hecatomb
+            8908, // La Velue
+            8909, // Itzpapalotl
+            8913, // Coquecigrue
+            8914, // Indomitable
         };
 
         public override void OnPulse()
