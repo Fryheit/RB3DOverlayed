@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using ff14bot;
 using System.Runtime.Caching;
+using System.Threading.Tasks;
+using ff14bot.Managers;
 using ff14bot.Overlay3D;
 using SlimDX;
+using SlimDX.Direct2D;
 using SlimDX.Direct3D9;
 using Font = SlimDX.Direct3D9.Font;
 using Mesh = SlimDX.Direct3D9.Mesh;
@@ -407,14 +411,49 @@ namespace RB3DOverlayed.Overlay
 
         public void DrawTriangles(Clio.Utilities.Vector3[] verts, Color color)
         {
+            if (verts.Length == 0)
+                return;
+
             if (verts.Length > _vertexBuffer.Length)
                 Array.Resize(ref _vertexBuffer, verts.Length);
 
-            for (int i = 0; i < verts.Length; i++)
-                _vertexBuffer[i] = new ColoredVertex(verts[i].Convert(), color);
+            if (verts.Length > 10000)
+            {
+                Parallel.For(0, verts.Length, i => _vertexBuffer[i] = new ColoredVertex(verts[i].Convert(), color));
+            }
+            else
+            {
+                for (int i = 0; i < verts.Length; i++)
+                    _vertexBuffer[i] = new ColoredVertex(verts[i].Convert(), color);
+            }
 
             SetDeclaration();
             Device.DrawUserPrimitives(PrimitiveType.TriangleList, verts.Length / 3, _vertexBuffer);
+        }
+
+
+        public void DrawTriangles(List<Clio.Utilities.Vector3> verts, Color color)
+        {
+            if (verts.Count == 0)
+                return;
+
+            if (verts.Count > _vertexBuffer.Length)
+                Array.Resize(ref _vertexBuffer, verts.Count); ;
+
+            if (verts.Count > 10000)
+            {
+                Parallel.For(0, verts.Count, i => _vertexBuffer[i] = new ColoredVertex(verts[i].Convert(), color));
+            }
+            else
+            {
+                for (int i = 0; i < verts.Count; i++)
+                    _vertexBuffer[i] = new ColoredVertex(verts[i].Convert(), color);
+            }
+
+
+
+            SetDeclaration();
+            Device.DrawUserPrimitives(PrimitiveType.TriangleList, verts.Count / 3, _vertexBuffer);
         }
 
         public void DrawTriangleFan(Clio.Utilities.Vector3[] poly, int index, int count, Color color)
