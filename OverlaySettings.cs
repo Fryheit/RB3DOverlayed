@@ -123,6 +123,12 @@
         [Description("Enables drawing B mobs in game")]
         public bool DrawHuntBMobs { get; set; }
 
+        [DefaultValue(true)]
+        [Category("4. The Hunt")]
+        [DisplayName("Mark Eureka mobs")]
+        [Description("Enables drawing Eureka mobs in game")]
+        public bool DrawHuntEMobs { get; set; }
+
         #endregion
 
         #region Mobs

@@ -27,6 +27,14 @@ namespace RB3DOverlayed
 
         private RenderForm _renderForm;
 
+        private readonly List<uint> _listEMobs = new List<uint>
+        {
+            7184, // Anemos Elemental
+            7567, // Pagos Elemental
+            7764, // Pyros Elemental
+            8131, // Hydatos Elemental
+        };
+
         private readonly List<uint> _listSMobs = new List<uint>
         {
             2953, // Laideronnette
@@ -251,7 +259,7 @@ namespace RB3DOverlayed
                 DrawGameStats(ctx);
             }
 
-            if (settings.DrawHuntSMobs || settings.DrawHuntAMobs || settings.DrawHuntBMobs)
+            if (settings.DrawHuntSMobs || settings.DrawHuntAMobs || settings.DrawHuntBMobs || settings.DrawEMobs)
             {
                 DrawHuntMobs(ctx);
             }
@@ -381,7 +389,8 @@ namespace RB3DOverlayed
             {
                 if (   (!settings.DrawHuntSMobs || !_listSMobs.Contains(obj.NpcId))
                     && (!settings.DrawHuntAMobs || !_listAMobs.Contains(obj.NpcId))
-                    && (!settings.DrawHuntBMobs || !_listBMobs.Contains(obj.NpcId)))
+                    && (!settings.DrawHuntBMobs || !_listBMobs.Contains(obj.NpcId))
+                    && (!settings.DrawHuntEMobs || !_listEMobs.Contains(obj.NpcId)))
                     continue;
 
                 var name = obj.Name;
@@ -394,6 +403,8 @@ namespace RB3DOverlayed
                     color = Color.Red;
                 if (_listBMobs.Contains(obj.NpcId))
                     color = Color.Green;
+                if (_listEMobs.Contains(obj.NpcId))
+                    color = Color.Blue;
 
                 if (!string.IsNullOrEmpty(name))
                     ctx.Draw3DText(name, vecCenter);
@@ -475,6 +486,11 @@ namespace RB3DOverlayed
                     if (_listBMobs.Contains(obj.NpcId))
                     {
                         sb.AppendLine(@"[B] " + obj.Name);
+                        huntFound = true;
+                    }
+                    if (_listEMobs.Contains(obj.NpcId))
+                    {
+                        sb.AppendLine(@"[E] " + obj.Name);
                         huntFound = true;
                     }
                 }
